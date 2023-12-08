@@ -73,7 +73,7 @@ def update_cupcake(id):
     """update a single cupcake and respond with updated JSON"""
     data = request.json
 
-    cupcake = Cupcake.query.get_or_404(cupcake_id)
+    cupcake = Cupcake.query.get_or_404(id)
 
     cupcake.flavor = data['flavor']
     cupcake.rating = data['rating']

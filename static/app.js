@@ -1,62 +1,52 @@
 const $cupcakeList = $('#cupcake-list')
-const $createCupcakeSubmitBtn = $("#cupcake-form-submit-button")
+const $newCupcakeForm = $('#new-cupcake-form')
 
-async function loadPage(){
+function generateCupcakeHTML(cupcake){
+    return `
+    <div data-cupcake-id=${cupcake.id}>
+    <li>
+      ${cupcake.flavor} / ${cupcake.size} / ${cupcake.rating}
+    </li>
+    <img class="Cupcake-img"
+          src="${cupcake.image}"
+          alt="(no image provided)">
+  </div>
+    `;
+}
+
+async function showStartingCupcakes(){
     const resp = await axios.get('/api/cupcakes');
     const cupcakes = resp.data.cupcakes;
 
-    cupcakes.forEach(cupcake => {
-        const newLi = $('<li>').html(`
-            <strong>ID:</strong> ${cupcake.id} <br>
-            <strong>Flavor:</strong> ${cupcake.flavor} <br>
-            <strong>Size:</strong> ${cupcake.size} <br>
-            <strong>Rating:</strong> ${cupcake.rating} <br>
-            <strong>Image:</strong> ${cupcake.image}
-        `);
-
-        $cupcakeList.append(newLi)
-    });
+    for(let cupcake of cupcakes){
+        let newCupcake = $(generateCupcakeHTML(cupcake));
+        $cupcakeList.append(newCupcake);
+    }
 }
 
 async function handleSubmitCreateCupcake(e){
     e.preventDefault();
 
     // Gather form data
-    const flavor = $('#flavor').val();
-    const size = $('#size').val();
-    const rating = $('#rating').val();
-    const image = $('#image').val();
-
-    // Create a new cupcake object
-    const newCupcake = {
-        flavor: flavor,
-        size: size,
-        rating: parseFloat(rating),
-        image: image,
-    };
+    let flavor = $('#flavor').val();
+    let size = $('#size').val();
+    let rating = $('#rating').val();
+    let image = $('#image').val();
     
     //send post request to add new cupcake
-    const resp = await axios.post('/api/cupcakes', newCupcake);
-    console.log(resp)
-
-    // Clear the form fields
-    $('#flavor').val('');
-    $('#size').val('');
-    $('#rating').val('');
-    $('#image').val('');
+    const newCupcakeResp = await axios.post('/api/cupcakes', {
+        flavor,
+        size,
+        rating,
+        image
+    });
 
     // Add the new cupcake to the list without reloading the page
-    const newLi = $('<li>').html(`
-        <strong>ID:</strong> ${resp.data.id} <br>
-        <strong>Flavor:</strong> ${resp.data.flavor} <br>
-        <strong>Size:</strong> ${resp.data.size} <br>
-        <strong>Rating:</strong> ${resp.data.rating} <br>
-        <strong>Image:</strong> ${resp.data.image}
-    `);
-
-    $cupcakeList.append(newLi)
+    let newCupcake = $(generateCupcakeHTML(newCupcakeResp.data));
+    $cupcakeList.append(newCupcake);
+    $newCupcakeForm.trigger("reset");
 };
 
-$createCupcakeSubmitBtn.on("click", handleSubmitCreateCupcake);
+$newCupcakeForm.on("submit", handleSubmitCreateCupcake);
 
-$(document).ready(loadPage)
+$(showStartingCupcakes)
