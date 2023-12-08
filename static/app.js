@@ -37,6 +37,7 @@ async function handleSubmitCreateCupcake(e){
     
     //send post request to add new cupcake
     const resp = await axios.post('/api/cupcakes', newCupcake);
+    console.log(resp)
 
     // Clear the form fields
     $('#flavor').val('');
@@ -46,11 +47,11 @@ async function handleSubmitCreateCupcake(e){
 
     // Add the new cupcake to the list without reloading the page
     const newLi = $('<li>').html(`
-        <strong>ID:</strong> ${resp.data.cupcake.id} <br>
-        <strong>Flavor:</strong> ${resp.data.cupcake.flavor} <br>
-        <strong>Size:</strong> ${resp.data.cupcake.size} <br>
-        <strong>Rating:</strong> ${resp.data.cupcake.rating} <br>
-        <strong>Image:</strong> ${resp.data.cupcake.image}
+        <strong>ID:</strong> ${resp.data.id} <br>
+        <strong>Flavor:</strong> ${resp.data.flavor} <br>
+        <strong>Size:</strong> ${resp.data.size} <br>
+        <strong>Rating:</strong> ${resp.data.rating} <br>
+        <strong>Image:</strong> ${resp.data.image}
     `);
 
     $cupcakeList.append(newLi)

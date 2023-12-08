@@ -53,34 +53,40 @@ def show_single_cupcake_details(id):
 @app.route('/api/cupcakes', methods=["POST"])
 def create_cupcake():
     """Create a cupcake from JSON data and return JSON details"""
-    flavor = request.json["flavor"]
-    size = request.json["size"]
-    rating = request.json["rating"]
-    image = request.json["image"]
+    data = request.json
 
-    new_cupcake = Cupcake(flavor=flavor, size=size, rating=rating, image=image)
-    db.session.add(new_cupcake)
+    cupcake = Cupcake(
+        flavor=data['flavor'],
+        rating=data['rating'],
+        size=data['size'],
+        image=data['image'] or None)
+    
+    db.session.add(cupcake)
     db.session.commit()
 
-    serialized = serialize_cupcake(new_cupcake)
-    data = jsonify(cupcake=serialized)
+    serialized = serialize_cupcake(cupcake)
 
-    return (data, 201)
+    return (jsonify(serialized), 201)
 
 @app.route('/api/cupcakes/<int:id>', methods=["PATCH"])
 def update_cupcake(id):
     """update a single cupcake and respond with updated JSON"""
-    cupcake = Cupcake.query.get_or_404(id)
-    
-    cupcake.flavor = request.json.get('flavor', cupcake.flavor)
-    cupcake.size = request.json.get('size', cupcake.size)
-    cupcake.rating = request.json.get('rating', cupcake.rating)
-    cupcake.image = request.json.get('image', cupcake.image)
+    data = request.json
 
+    cupcake = Cupcake.query.get_or_404(cupcake_id)
+
+    cupcake.flavor = data['flavor']
+    cupcake.rating = data['rating']
+    cupcake.size = data['size']
+    cupcake.image = data['image']
+
+    db.session.add(cupcake)
     db.session.commit()
-    data = jsonify(serialize_cupcake(cupcake))
 
-    return(data)
+    serialized = serialize_cupcake(cupcake)
+
+
+    return jsonify(serialized)
 
 @app.route('/api/cupcakes/<int:id>', methods=["DELETE"])
 def delete_cupcake(id):
